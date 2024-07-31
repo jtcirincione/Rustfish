@@ -24,5 +24,5 @@ async fn main() {
 }
 
 async fn get_board() -> String {
-    return String::from("jefflovescockandballs world!");
+    return String::from("hello world!");
 }
