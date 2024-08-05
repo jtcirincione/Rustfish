@@ -1,4 +1,6 @@
+/* global BigInt */
 import { React, useState, useEffect } from "react";
+import axios from 'axios';
 import bR from './images/bR.png';
 import bN from './images/bN.png';
 import bB from './images/bB.png';
@@ -67,19 +69,56 @@ function Chessboard() {
         };
     }, []);
 
+    const imageMapping = {
+        "wp": wp,
+        "wB": wB,
+        "wR": wR,
+        "wQ": wQ,
+        "wN": wN,
+        "wK": wK,
+        "bp": bp,
+        "bB": bB,
+        "bR": bR,
+        "bQ": bQ,
+        "bN": bN,
+        "bK": bK
+    };
 
-    function bitBoardToImages(bitBoard) {
 
+    function bitBoardToImages() {
+        let req = axios.get("http://localhost:3001/board");
+        req.then(function (res) {
+            const board = res.data.game;
+            console.log(imageMapping[board[1]])
+            for (let i = 0; i < 64; i++) {
+                if (board[i] == ""){
+                    images[i] = null;
+                }
+                else {
+                    images[i] = imageMapping[board[i]];
+                }
+            }
+        })
     }
 
     function onDown(e, piece, idx) {
         e.preventDefault();
         if (!piece) {
-            return
+            return;
         }
         setIsDragging(true);
         setClickedPiece({piece, idx});
         images[idx] = null;
+    }
+
+    function makeMove(piece, from, to) {
+        //move: [from, to]
+        axios.post('/move', {
+            move: [from, to],
+        }).then(function (res) {
+            console.log("made move successfully")
+        });
+
     }
 
     function movePiece(e, idx) {
@@ -96,11 +135,14 @@ function Chessboard() {
             setIsDragging(false)
             return
         }
-        images[idx] = clickedPiece.piece;
+        // images[idx] = clickedPiece.piece;
         images[clickedPiece.idx] = null;
+        //actually move the 
+        makeMove(clickedPiece.piece, clickedPiece.idx, idx)
         setIsDragging(false);
         setClickedPiece(null);
-        initializeImages(images);
+        bitBoardToImages();
+
 
 
     }
@@ -136,7 +178,7 @@ function Chessboard() {
             {isDragging && clickedPiece && (
                 <img
                     src={clickedPiece.piece}
-                    alt={clickedPiece.piece}
+                    alt="Error displaying piece"
                     className="object-contain absolute"
                     style={{
                         left: mousePosition.x - 40,
