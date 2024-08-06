@@ -13,7 +13,7 @@ pub struct GameState {
     pub b_bishops: u64,
     pub b_king: u64,
     pub b_knights: u64,
-    pub bitboards: Vec<(u64, &'static str, &'static str)>,
+    pub bitboards: std::collections::HashMap<String, (u64, String, String)>,
     
 }
 
@@ -46,20 +46,7 @@ impl GameState {
             b_bishops,
             b_king,
             b_knights,
-            bitboards: vec![
-                (w_queens, "Q", "w"),
-                (w_pawns, "p", "w"),
-                (w_rooks, "R", "w"),
-                (w_bishops, "B", "w"),
-                (w_king, "K", "w"),
-                (w_knights, "N", "w"),
-                (b_queens, "Q", "b"),
-                (b_pawns, "p", "b"),
-                (b_rooks, "R", "b"),
-                (b_bishops, "B", "b"),
-                (b_king, "K", "b"),
-                (b_knights, "N", "b"),
-            ],
+            bitboards: std::collections::HashMap::new(),
         }
     }
 
@@ -76,10 +63,10 @@ impl GameState {
         
         for i in 0..64 {
             let mut found = false;
-            for (bitboard, piece, color) in &self.bitboards {
-                if Self::get_bit(bitboard, i) == 1 {
+            for (key, val) in self.bitboards.into_iter() {
+                if Self::get_bit(&val.0, i) == 1 {
                     found = true;
-                    board_vec.push(format!("{}{}", color, piece));
+                    board_vec.push(format!("{}{}", val.1, val.2));
                     break;
                 }
             }
