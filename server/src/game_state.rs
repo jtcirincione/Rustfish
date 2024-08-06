@@ -1,4 +1,3 @@
-use axum::Json;
 #[derive(Clone)]
 pub struct GameState {
     pub w_queens: u64,
@@ -13,7 +12,7 @@ pub struct GameState {
     pub b_bishops: u64,
     pub b_king: u64,
     pub b_knights: u64,
-    pub bitboards: std::collections::HashMap<String, (u64, String, String)>,
+    pub bitboards: std::collections::HashMap<String, u64>,
     
 }
 
@@ -46,12 +45,22 @@ impl GameState {
             b_bishops,
             b_king,
             b_knights,
-            bitboards: std::collections::HashMap::new(),
-        }
-    }
+            bitboards: std::collections::HashMap::from([
+                ("wQ".to_string(), w_queens),
+                ("wp".to_string(), w_pawns),
+                ("wR".to_string(), w_rooks),
+                ("wB".to_string(), w_bishops),
+                ("wK".to_string(), w_king),
+                ("wN".to_string(), w_knights),
+                ("bQ".to_string(), b_queens),
+                ("bp".to_string(), b_pawns),
+                ("bR".to_string(), b_rooks),
+                ("bB".to_string(), b_bishops),
+                ("bK".to_string(), b_king),
+                ("bN".to_string(), b_knights),
 
-    pub fn to_json(self) -> Json<GameState> {
-        Json(self)
+            ]),
+        }
     }
 
     pub fn get_bit(board: &u64, idx: u8) -> u64 {
@@ -63,10 +72,10 @@ impl GameState {
         
         for i in 0..64 {
             let mut found = false;
-            for (key, val) in self.bitboards.into_iter() {
-                if Self::get_bit(&val.0, i) == 1 {
+            for (key, val) in &self.bitboards {
+                if Self::get_bit(&val, i) == 1 {
                     found = true;
-                    board_vec.push(format!("{}{}", val.1, val.2));
+                    board_vec.push(format!("{}", key));
                     break;
                 }
             }
@@ -80,9 +89,21 @@ impl GameState {
         return board_vec;
     }
 
-    pub fn make_move(&self, from: i32, to: i32, piece_type: &str) {
-        let from = 63 - from;
-        let to = 63 - to;
+    pub fn actually_move(board: &mut u64, from: u64, to: u64) {
+        let mask = 1 << (63 - from);
+        if *board & mask != 0 {
+            *board &= !mask; // Remove piece from `from`
+            *board |= 1 << (63 - to); // Add piece to `to`
+        }
+        return ();
+    }
+
+    pub fn make_move(&mut self, from: u64, to: u64, piece_type: &String) {
+        //TODO: handle errors and early return
+        if let Some(board) = self.bitboards.get_mut(piece_type) {
+            Self::actually_move(board, from, to);
+        }
+        
         return ()
 
     }

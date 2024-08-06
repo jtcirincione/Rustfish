@@ -112,11 +112,26 @@ function Chessboard() {
     }
 
     function makeMove(piece, from, to) {
+        let piecename = "";
+        for (const [key, val] of Object.entries(imageMapping)) {
+            if (piece === val) {
+                piecename = key;
+                break;
+            }
+        }
+        if (piecename == "") {
+            console.log("No piece selected to move.")
+            return;
+        }
         //move: [from, to]
-        axios.post('/move', {
-            move: [from, to],
+        axios.post('http://localhost:3001/move', {
+            to: to,
+            from: from,
+            piece_type: piecename,
         }).then(function (res) {
             console.log("made move successfully")
+        }).catch(err => {
+            console.log(err + "There was an error sending a move");
         });
 
     }
@@ -136,7 +151,7 @@ function Chessboard() {
             return
         }
         // images[idx] = clickedPiece.piece;
-        images[clickedPiece.idx] = null;
+        // images[clickedPiece.idx] = null;
         //actually move the 
         makeMove(clickedPiece.piece, clickedPiece.idx, idx)
         setIsDragging(false);
