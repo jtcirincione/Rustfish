@@ -111,22 +111,22 @@ function Chessboard() {
                 break;
             }
         }
-        if (piecename == "") {
-            console.log("No piece selected to move.")
-            return;
+        if (piecename === "") {
+            console.log("No piece selected to move.");
+            return Promise.resolve(); // Resolve immediately if no piece is selected
         }
-        //move: [from, to]
-        axios.post('http://localhost:80/api/move', {
+    
+        // Return the promise from axios.post
+        return axios.post('http://localhost:80/api/move', {
             to: to,
             from: from,
             piece_type: piecename,
             capture_type: null,
         }).then(function (res) {
-            console.log("made move successfully")
+            console.log("Made move successfully");
         }).catch(err => {
-            console.log(err + "There was an error sending a move");
+            console.log(err + " There was an error sending a move");
         });
-
     }
 
     function movePiece(e, idx) {
@@ -146,11 +146,11 @@ function Chessboard() {
         // images[idx] = clickedPiece.piece;
         // images[clickedPiece.idx] = null;
         //actually move the 
-        makeMove(clickedPiece.piece, clickedPiece.idx, idx)
-        setIsDragging(false);
-        setClickedPiece(null);
-        bitBoardToImages();
-
+        makeMove(clickedPiece.piece, clickedPiece.idx, idx).then((res) => {
+            bitBoardToImages();
+            setClickedPiece(null);
+            setIsDragging(false);
+        });
 
 
     }
