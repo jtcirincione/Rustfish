@@ -98,7 +98,7 @@ impl GameState {
         return ();
     }
 
-    pub fn make_move(&mut self, from: u64, to: u64, piece_type: &String) {
+    pub fn make_move(&mut self, from: u64, to: u64, piece_type: &String, capture_type: &Option<String>) {
         //TODO: handle errors and early return
         if let Some(board) = self.bitboards.get_mut(piece_type) {
             Self::actually_move(board, from, to);

@@ -16,7 +16,8 @@ use serde_derive::Deserialize;
 struct RequestPayload {
     from: u64,
     to: u64,
-    piece_type: String
+    piece_type: String,
+    capture_type: Option<String>
 }
 
 
@@ -37,7 +38,7 @@ async fn get_board(State(state): State<Arc<Mutex<GameState>>>) -> impl IntoRespo
 
 async fn make_move(State(state): State<Arc<Mutex<GameState>>>, Json(payload): Json<RequestPayload>) -> impl IntoResponse {
     let mut game_state = state.lock().unwrap();
-    let RequestPayload {to, from, piece_type} = payload;
-    game_state.make_move(from, to, &piece_type);
+    let RequestPayload {to, from, piece_type, capture_type} = payload;
+    game_state.make_move(from, to, &piece_type, &capture_type);
     return (StatusCode::OK, String::from("Successfully moved!"))
 }

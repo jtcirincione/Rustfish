@@ -44,23 +44,12 @@ function Chessboard() {
 
 
         setChessBoard(result);
-        let images = [
-            bR, bN, bB, bQ, bK, bB, bN, bR,
-            bp, bp, bp, bp, bp, bp, bp, bp,
-            null, null, null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null,
-            wp, wp, wp, wp, wp, wp, wp, wp,
-            wR, wN, wB, wQ, wK, wB, wN, wR
-        ];
-
-
+    
         const handleMouseMove = (e) => {
             setMousePosition({ x: e.clientX, y: e.clientY });
         };
 
-        initializeImages(images);
+        bitBoardToImages()
 
         window.addEventListener('mousemove', handleMouseMove);
 
@@ -89,18 +78,20 @@ function Chessboard() {
         let req = axios.get("http://localhost:3001/board");
         req.then(function (res) {
             const board = res.data.game;
-            console.log(imageMapping[board[1]])
+            const imageCopy = [];
             for (let i = 0; i < 64; i++) {
                 if (board[i] == ""){
-                    images[i] = null;
+                    imageCopy.push(null);
                 }
                 else {
-                    images[i] = imageMapping[board[i]];
+                    imageCopy.push(imageMapping[board[i]]);
                 }
             }
+            initializeImages(imageCopy);
         })
     }
 
+    //executes when mouse is pressed down
     function onDown(e, piece, idx) {
         e.preventDefault();
         if (!piece) {
@@ -111,6 +102,7 @@ function Chessboard() {
         images[idx] = null;
     }
 
+    //executes when mouse is released
     function makeMove(piece, from, to) {
         let piecename = "";
         for (const [key, val] of Object.entries(imageMapping)) {
@@ -128,6 +120,7 @@ function Chessboard() {
             to: to,
             from: from,
             piece_type: piecename,
+            capture_type: null,
         }).then(function (res) {
             console.log("made move successfully")
         }).catch(err => {
