@@ -75,7 +75,7 @@ function Chessboard() {
 
 
     function bitBoardToImages() {
-        let req = axios.get("http://localhost:3001/board");
+        let req = axios.get("http://localhost:80/api/board");
         req.then(function (res) {
             const board = res.data.game;
             const imageCopy = [];
@@ -116,7 +116,7 @@ function Chessboard() {
             return;
         }
         //move: [from, to]
-        axios.post('http://localhost:3001/move', {
+        axios.post('http://localhost:80/api/move', {
             to: to,
             from: from,
             piece_type: piecename,
