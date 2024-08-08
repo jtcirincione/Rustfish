@@ -40,5 +40,8 @@ async fn make_move(State(state): State<Arc<Mutex<GameState>>>, Json(payload): Js
     let mut game_state = state.lock().unwrap();
     let RequestPayload {to, from, piece_type, capture_type} = payload;
     game_state.make_move(from, to, &piece_type, &capture_type);
+    if let Some(foo) = capture_type {
+        println!("String {} exists!", foo);
+    }
     return (StatusCode::OK, String::from("Successfully moved!"))
 }

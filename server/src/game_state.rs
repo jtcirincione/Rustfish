@@ -13,23 +13,18 @@ pub struct GameState {
     pub b_king: u64,
     pub b_knights: u64,
     pub bitboards: std::collections::HashMap<String, u64>,
+    pub history: Vec<u64>
     
 }
 
 impl GameState {
     pub fn new() -> GameState {
-        let w_queens = 0x0000000000000008;
-        let w_pawns = 0x000000000000FF00;
-        let w_rooks = 0x0000000000000081;
-        let w_bishops = 0x0000000000000024;
-        let w_king = 0x0000000000000010;
-        let w_knights = 0x0000000000000042;
-        let b_queens = 0x0800000000000000;
-        let b_pawns = 0x00FF000000000000;
-        let b_rooks = 0x8100000000000000;
-        let b_bishops = 0x2400000000000000;
-        let b_king = 0x1000000000000000;
-        let b_knights = 0x4200000000000000;
+        let w_queens = 0x0000000000000008; let w_pawns = 0x000000000000FF00;
+        let w_rooks = 0x0000000000000081; let w_bishops = 0x0000000000000024;
+        let w_king = 0x0000000000000010; let w_knights = 0x0000000000000042;
+        let b_queens = 0x0800000000000000; let b_pawns = 0x00FF000000000000;
+        let b_rooks = 0x8100000000000000; let b_bishops = 0x2400000000000000;
+        let b_king = 0x1000000000000000; let b_knights = 0x4200000000000000;
         
 
         return GameState {
@@ -46,20 +41,14 @@ impl GameState {
             b_king,
             b_knights,
             bitboards: std::collections::HashMap::from([
-                ("wQ".to_string(), w_queens),
-                ("wp".to_string(), w_pawns),
-                ("wR".to_string(), w_rooks),
-                ("wB".to_string(), w_bishops),
-                ("wK".to_string(), w_king),
-                ("wN".to_string(), w_knights),
-                ("bQ".to_string(), b_queens),
-                ("bp".to_string(), b_pawns),
-                ("bR".to_string(), b_rooks),
-                ("bB".to_string(), b_bishops),
-                ("bK".to_string(), b_king),
-                ("bN".to_string(), b_knights),
-
+                ("wQ".to_string(), w_queens), ("wp".to_string(), w_pawns),
+                ("wR".to_string(), w_rooks), ("wB".to_string(), w_bishops),
+                ("wK".to_string(), w_king), ("wN".to_string(), w_knights),
+                ("bQ".to_string(), b_queens), ("bp".to_string(), b_pawns),
+                ("bR".to_string(), b_rooks), ("bB".to_string(), b_bishops),
+                ("bK".to_string(), b_king), ("bN".to_string(), b_knights),
             ]),
+            history: Vec::new(),
         }
     }
 
@@ -89,22 +78,33 @@ impl GameState {
         return board_vec;
     }
 
-    pub fn actually_move(board: &mut u64, from: u64, to: u64) {
+    pub fn actually_move(&mut self, piece_type: &String, from: u64, to: u64, capture_type: &Option<String>) {
+        println!("yay");
         let mask = 1 << (63 - from);
-        if *board & mask != 0 {
+        if let Some(board) = self.bitboards.get_mut(piece_type) {
             *board &= !mask; // Remove piece from `from`
             *board |= 1 << (63 - to); // Add piece to `to`
+            println!("found {}", board);
+            if let Some(capture_string) = capture_type {
+                if let Some(capture_board) = self.bitboards.get_mut(capture_string) {
+                    let to_mask = 1 << (63 - to);
+                    *capture_board &= !to_mask;
+                    println!("this was a capture move.");
+                }
+            }
         }
         return ();
     }
 
     pub fn make_move(&mut self, from: u64, to: u64, piece_type: &String, capture_type: &Option<String>) {
         //TODO: handle errors and early return
-        if let Some(board) = self.bitboards.get_mut(piece_type) {
-            Self::actually_move(board, from, to);
-        }
+        self.actually_move(piece_type, from, to, capture_type);
         
         return ()
+
+    }
+
+    pub fn generate_pseudo_moves() {
 
     }
 }

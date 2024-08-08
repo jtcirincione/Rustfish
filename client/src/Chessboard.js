@@ -70,7 +70,7 @@ function Chessboard() {
         "bR": bR,
         "bQ": bQ,
         "bN": bN,
-        "bK": bK
+        "bK": bK,
     };
 
 
