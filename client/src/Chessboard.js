@@ -105,12 +105,21 @@ function Chessboard() {
     //executes when mouse is released
     function makeMove(piece, from, to) {
         let piecename = "";
+        let capture = images[to];
+        console.log("capture image: " + capture);
+        let capturename = "";
         for (const [key, val] of Object.entries(imageMapping)) {
             if (piece === val) {
                 piecename = key;
-                break;
+            }
+            if (capture === val) {
+                capturename = key;
             }
         }
+        if (!capturename) {
+            capturename = null;
+        }
+        console.log("capture piece: " + capturename);
         if (piecename === "") {
             console.log("No piece selected to move.");
             return Promise.resolve(); // Resolve immediately if no piece is selected
@@ -121,7 +130,7 @@ function Chessboard() {
             to: to,
             from: from,
             piece_type: piecename,
-            capture_type: null,
+            capture_type: capturename,
         }).then(function (res) {
             console.log("Made move successfully");
         }).catch(err => {

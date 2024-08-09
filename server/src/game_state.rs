@@ -1,3 +1,5 @@
+use crate::utils::*;
+
 #[derive(Clone)]
 pub struct GameState {
     pub w_queens: u64,
@@ -25,7 +27,6 @@ impl GameState {
         let b_queens = 0x0800000000000000; let b_pawns = 0x00FF000000000000;
         let b_rooks = 0x8100000000000000; let b_bishops = 0x2400000000000000;
         let b_king = 0x1000000000000000; let b_knights = 0x4200000000000000;
-        
 
         return GameState {
             w_queens,
@@ -73,8 +74,6 @@ impl GameState {
             }
         }
         
-        //the plan is to append a 'color'[piecetype] to the vector for whatever type of piece has a 1 at that index. how do I do this
-        
         return board_vec;
     }
 
@@ -93,7 +92,12 @@ impl GameState {
                 }
             }
         }
+        
         return ();
+    }
+
+    pub fn get_valid_moves(&self) {
+
     }
 
     pub fn make_move(&mut self, from: u64, to: u64, piece_type: &String, capture_type: &Option<String>) {
