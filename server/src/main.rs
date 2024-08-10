@@ -2,10 +2,15 @@ use std::sync::{Arc, Mutex};
 pub mod routes;
 pub mod game_state;
 mod utils {
-    pub mod king_moves;
-    pub mod knight_moves;
-    pub mod pawn_moves;
-    pub mod sliding_piece_moves;
+    pub mod moves {
+        pub mod king_moves;
+        pub mod knight_moves;
+        pub mod pawn_moves;
+        pub mod sliding_piece_moves;
+        pub mod bishop_moves;
+        pub mod rook_moves;
+        pub mod queen_moves;
+    }
 }
 
 #[tokio::main]
