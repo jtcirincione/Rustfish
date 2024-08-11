@@ -1,4 +1,8 @@
-use crate::utils::*;
+use tower::util::error::optional::None;
+
+use crate::utils::moves::*;
+use crate::enums::Turn;
+use crate::piece_move::Move;
 
 #[derive(Clone)]
 pub struct GameState {
@@ -15,7 +19,8 @@ pub struct GameState {
     pub b_king: u64,
     pub b_knights: u64,
     pub bitboards: std::collections::HashMap<String, u64>,
-    pub history: Vec<u64>
+    pub history: Vec<u64>,
+    pub white: bool,
     
 }
 
@@ -50,6 +55,7 @@ impl GameState {
                 ("bK".to_string(), b_king), ("bN".to_string(), b_knights),
             ]),
             history: Vec::new(),
+            white: true,
         }
     }
 
@@ -96,8 +102,16 @@ impl GameState {
         return ();
     }
 
-    pub fn get_valid_moves(&self) {
-
+    pub fn get_valid_moves(&self, piece_type: &String, color: Turn) -> Vec<Move> {
+        let mut moves = Vec::new();
+        if let Some(board) = self.bitboards.get_mut(piece_type) {
+            match piece_type {
+                "wp" => pawn_moves::generate_pseudo_moves(board, enemy, occupied, white)
+            }
+        }
+        else {
+            return Vec::new();
+        }
     }
 
     pub fn make_move(&mut self, from: u64, to: u64, piece_type: &String, capture_type: &Option<String>) {

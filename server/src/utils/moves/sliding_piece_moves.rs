@@ -4,25 +4,25 @@ const FILE_A_MASK: u64 = 0b01111111011111110111111101111111011111110111111101111
 
 
 // from top right to bottom left
-const diagonal_masks: [u64; 15] = [
+const DIAGONAL_MASKS: [u64; 15] = [
     0x8000000000000000, 0x4080000000000000, 0x2040800000000000, 0x1020408000000000, 
     0x810204080000000, 0x408102040800000, 0x204081020408000, 0x102040810204080, 
     0x1020408102040, 0x10204081020, 0x102040810, 0x1020408,
     0x10204, 0x102, 0x1
 ];
 // from top left to bottom right
-const antidiagonal_masks: [u64; 15] = [ 0x100000000000000, 0x201000000000000, 0x402010000000000, 0x804020100000000,
+const ANTIDIAGONAL_MASKS: [u64; 15] = [ 0x100000000000000, 0x201000000000000, 0x402010000000000, 0x804020100000000,
                 0x1008040201000000, 0x2010080402010000, 0x4020100804020100, 0x8040201008040201,
                 0x80402010080402, 0x804020100804, 0x8040201008, 0x80402010, 0x804020, 
                 0x8040, 0x80
 ];
 
 // from rank 1 to 8
-const rank_masks: [u64; 8] = [0xFF00000000000000, 0xFF000000000000, 0xFF0000000000, 0xFF00000000,
+const RANK_MASKS: [u64; 8] = [0xFF00000000000000, 0xFF000000000000, 0xFF0000000000, 0xFF00000000,
             0xFF000000, 0xFF0000, 0xFF00, 0xFF];
 
 // from file H to A
-const file_masks: [u64; 8] = [
+const FILE_MASKS: [u64; 8] = [
     0x8080808080808080,
     0x4040404040404040,
     0x2020202020202020,
@@ -34,7 +34,7 @@ const file_masks: [u64; 8] = [
 ];
 
 
-const index64: [u64; 64] = [
+const INDEX64: [u64; 64] = [
     0, 47,  1, 56, 48, 27,  2, 60,
    57, 49, 41, 37, 28, 16,  3, 61,
    54, 58, 35, 52, 50, 42, 21, 44,
@@ -61,7 +61,7 @@ pub fn get_idx_of_lsb(board: u64) -> (usize, u64) {
         panic!("Board is empty! couldn't get lsb");
     }
     let idx = ((board ^ (board - 1)) * 0x03f79d71b4cb0a89 >> 58) as usize;
-    let mut i = index64[idx];
+    let mut i = INDEX64[idx];
     
     let shift = i;
     i = 63 - i;
@@ -72,22 +72,22 @@ pub fn h_v_moves(my_sliding_piece: u64, occupied: u64) -> u64 {
         let s = my_sliding_piece;
         let (idx, _) = get_idx_of_lsb(my_sliding_piece);
         
-        let occ_h = occupied & rank_masks[idx/8];
-        let occ_v = occupied & file_masks[idx%8];
+        let occ_h = occupied & RANK_MASKS[idx/8];
+        let occ_v = occupied & FILE_MASKS[idx%8];
         
         let horizontal = (occ_h - (2 * s)) ^ reverse_bits(reverse_bits(occ_h) - 2 * reverse_bits(s));
         let vertical = (occ_v - (2 * s)) ^ reverse_bits(reverse_bits(occ_v) - 2 * reverse_bits(s));
-        return (horizontal & rank_masks[idx/8]) | (vertical & file_masks[idx%8]);
+        return (horizontal & RANK_MASKS[idx/8]) | (vertical & FILE_MASKS[idx%8]);
 }
 
 pub fn d_anti_moves(my_sliding_piece: u64, occupied: u64) -> u64 {
         let s = my_sliding_piece;
         let (idx, _) = get_idx_of_lsb(my_sliding_piece);
-        let occ_d = occupied & diagonal_masks[(idx/8) + (idx%8)];
-        let occ_a = occupied & antidiagonal_masks[(idx/8) + 7 - (idx%8)];
+        let occ_d = occupied & DIAGONAL_MASKS[(idx/8) + (idx%8)];
+        let occ_a = occupied & ANTIDIAGONAL_MASKS[(idx/8) + 7 - (idx%8)];
         
         let diagonal = (occ_d - (2 * s)) ^ reverse_bits(reverse_bits(occ_d) - 2 * reverse_bits(s)); 
         let antidiagonal = (occ_a - (2 * s)) ^ reverse_bits(reverse_bits(occ_a) - 2 * reverse_bits(s));
-        return (diagonal & diagonal_masks[(idx/8) + (idx%8)]) | (antidiagonal & antidiagonal_masks[(idx/8) + 7 - (idx%8)]);
+        return (diagonal & DIAGONAL_MASKS[(idx/8) + (idx%8)]) | (antidiagonal & ANTIDIAGONAL_MASKS[(idx/8) + 7 - (idx%8)]);
 
 }

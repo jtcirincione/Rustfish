@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 pub mod routes;
 pub mod game_state;
-mod utils {
+pub mod utils {
     pub mod moves {
         pub mod king_moves;
         pub mod knight_moves;
@@ -12,6 +12,8 @@ mod utils {
         pub mod queen_moves;
     }
 }
+pub mod enums;
+pub mod piece_move;
 
 #[tokio::main]
 async fn main() {
