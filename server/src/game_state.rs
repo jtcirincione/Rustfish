@@ -14,7 +14,7 @@ pub struct GameState {
 
 impl GameState {
     pub fn new() -> GameState {
-        let board = Chessboard::default();
+        let board = Chessboard::new();
 
         return GameState {
             board,
