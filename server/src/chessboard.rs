@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::enums::Turn;
+use crate::attacks::AttackTables;
 
 const NOT_GH_MASK: u64 =
     0b0011111100111111001111110011111100111111001111110011111100111111;
