@@ -5,6 +5,7 @@ pub mod chessboard;
 pub mod enums;
 pub mod piece_move;
 pub mod attacks;
+pub mod bitboard;
 
 #[tokio::main]
 async fn main() {
