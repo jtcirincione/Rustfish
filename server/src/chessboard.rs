@@ -41,16 +41,15 @@ impl Chessboard {
     pub fn new() -> Chessboard {
         let mut pieces = HashMap::new();
         
-        pieces.insert(String::from("queens"), [0x00000000000008, 0x1000000000000000]); // White on D1, Black on D8
-        pieces.insert(String::from("kings"), [0x00000000000010, 0x0800000000000000]); // White on E1, Black on E8
-        pieces.insert(String::from("rooks"), [0x00000000000081, 0x8100000000000000]); // White on A1 and H1; Black on A8 and H8
-        pieces.insert(String::from("bishops"), [0x00000000000024, 0x2400000000000000]); // White on C1 and F1; Black on C8 and F8
-        pieces.insert(String::from("knights"), [0x00000000000042, 0x4200000000000000]); // White on B1 and G1; Black on B8 and G8
-        pieces.insert(String::from("pawns"), [0x000000000000FF00, 0x00FF000000000000]); // White on A2-H2; Black on A7-H7
+        pieces.insert(String::from("Q"), [0x00000000000008, 0x1000000000000000]); // White on D1, Black on D8
+        pieces.insert(String::from("K"), [0x00000000000010, 0x0800000000000000]); // White on E1, Black on E8
+        pieces.insert(String::from("R"), [0x00000000000081, 0x8100000000000000]); // White on A1 and H1; Black on A8 and H8
+        pieces.insert(String::from("B"), [0x00000000000024, 0x2400000000000000]); // White on C1 and F1; Black on C8 and F8
+        pieces.insert(String::from("N"), [0x00000000000042, 0x4200000000000000]); // White on B1 and G1; Black on B8 and G8
+        pieces.insert(String::from("p"), [0x000000000000FF00, 0x00FF000000000000]); // White on A2-H2; Black on A7-H7
         
         let board = Chessboard { pieces };
 
-        board.precompute_knights();
         return board;
     }
 
@@ -108,84 +107,8 @@ impl Chessboard {
         return occupancy;
     }
 
-    pub fn generate_knight_moves(&self, idx: usize) -> u64 {
-        let mut knight_move: u64 = 0x0;
-        let board: u64 = 1 << idx;
-        let moves:[i32; 8] = [
-            6,  // top left move restrict from G and H
-            15,  // top left move restrict from H
-            10,  // top right move, # restrict from A and B
-            17,  // top right move, # restrict from A
-            -6,  // bottom right move # restrict from A and B
-            -15,  // bottom right move # restrict from A
-            -10,  // bottom left move # restrict from G and H
-            -17  // bottom left move # restrict from H
-        ];
-        for mov in moves {
-            let mut position: u64 = 0;
-            if mov > 0 {
-                position = board << mov;
-            }
-            else {
-                position = board >> -mov;
-            }
-            if mov == 6 || mov == -10 {
-                position &= NOT_GH_MASK;
-            }
-            if mov == 15 || mov == -17 {
-                position &= NOT_H_MASK;
-            }
-            if mov == 10 || mov == -6 {
-                position &= NOT_AB_MASK;
-            }
-            if mov == -15 || mov == 17 {
-                position &= NOT_A_MASK;
-            }
-            knight_move |= position;
-        }
-        return knight_move;
-
-    }
-
-    pub fn precompute_knights(&self) {
-        let mut attacks: [u64; 64] = [0; 64];
-        for i in 0..64 {
-            attacks[i] = self.generate_knight_moves(i);
-        }
-    }
-
-    pub fn precompute_kings(&self) {
-        for i in 0..64 {
-            self.KING_MOVES[i] = self.generate_king_moves(i);
-        }
-    }
-
-    pub fn generate_king_moves(&self, idx: usize) -> u64 {
-        let mut king_move = 0;
-        let board: u64 = 1 << idx;
-
-        let moves = [8, -8, 1, -1, 7, 9, -7, -9];
-        
-        for mov in moves {
-            let mut potential_move: u64 = 0;
-            if mov > 0 {
-                potential_move = board << mov
-            }
-            else {
-                potential_move = (board >> -mov);
-            }
-
-            if mov == -1 || mov == -9 || mov == 7{  // if piece is moving to the left
-                potential_move &= NOT_H_MASK;
-            }
-            if mov == 1 || mov == 9 || mov == -7{ // if piece is moving to the right
-                potential_move &= NOT_A_MASK;
-            }
-
-            king_move |= potential_move;
-        }
-        return king_move
-    }
+    
+    
 }
 
 

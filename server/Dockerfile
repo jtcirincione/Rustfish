@@ -11,7 +11,7 @@ RUN cargo build
 
 RUN cargo install --path ../
 
-RUN cargo install cargo-watch
+RUN cargo install --locked cargo-watch
 
 EXPOSE 3001
 

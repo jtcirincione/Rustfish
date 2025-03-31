@@ -1,5 +1,3 @@
-use tower::util::error::optional::None;
-
 use crate::chessboard::Chessboard;
 use crate::enums::Turn;
 use crate::piece_move::Move;
@@ -23,13 +21,34 @@ impl GameState {
         }
     }
 
-    pub fn get_bit(board: &u64, idx: u8) -> u64 {
+    pub fn get_bit(board: u64, idx: u8) -> u64 {
         return (board >> (63 - idx)) & 1;
     }
 
     pub fn game_to_array(&self) -> Vec<String> {
         let mut board_vec: Vec<String> = Vec::new();
-        
+
+        for rank in (0..8).rev() {
+            for file in 0..8 {
+                let i: u8 = rank * 8 + file;
+                let mut found = false;
+                for (name, piece) in &self.board.pieces {
+                    if Self::get_bit(piece[0], i) == 1 {
+                        board_vec.push(format!("w{}", name));
+                        found = true;
+                        break;
+                    }
+                    else if Self::get_bit(piece[1], i) == 1 {
+                        board_vec.push(format!("b{}", name));
+                        found = true;
+                        break;
+                    }
+                }
+                if !found {
+                    board_vec.push(String::from(""))
+                }
+            }
+        }
         return board_vec;
     }
 
