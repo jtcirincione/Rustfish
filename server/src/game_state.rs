@@ -1,3 +1,4 @@
+use crate::bitboard::Bitboard;
 use crate::chessboard::Chessboard;
 use crate::enums::Turn;
 use crate::piece_move::Move;
@@ -22,23 +23,23 @@ impl GameState {
     }
 
     pub fn get_bit(board: u64, idx: u8) -> u64 {
-        return (board >> (63 - idx)) & 1;
+        return (board >> idx) & 1;
     }
 
     pub fn game_to_array(&self) -> Vec<String> {
         let mut board_vec: Vec<String> = Vec::new();
 
-        for rank in (0..8).rev() {
+        for rank in 0..8 {
             for file in 0..8 {
                 let i: u8 = rank * 8 + file;
                 let mut found = false;
-                for (name, piece) in &self.board.pieces {
-                    if Self::get_bit(piece[0], i) == 1 {
+                for (name, bboard) in &self.board.pieces {
+                    if Self::get_bit(bboard[0].board, i) == 1 {
                         board_vec.push(format!("w{}", name));
                         found = true;
                         break;
                     }
-                    else if Self::get_bit(piece[1], i) == 1 {
+                    else if Self::get_bit(bboard[1].board, i) == 1 {
                         board_vec.push(format!("b{}", name));
                         found = true;
                         break;
@@ -52,22 +53,21 @@ impl GameState {
         return board_vec;
     }
 
-    pub fn actually_move(&mut self, piece_type: &String, from: u64, to: u64, capture_type: &Option<String>) {
-        println!("yay");
-        let mask = 1 << (63 - from);
-        
-        return ();
-    }
-
     pub fn get_valid_moves(&self, piece_type: &String, color: Turn) -> Vec<Move> {
-        let mut moves: Vec<Move> = Vec::new();
+        let moves: Vec<Move> = Vec::new();
         return moves;
     }
 
-    pub fn make_move(&mut self, from: u64, to: u64, piece_type: &String, capture_type: &Option<String>) {
+    pub fn make_move(&mut self, from: u64, to: u64, board_to_move_opt: Option<&mut Bitboard>, board_to_clear: Option<&mut Bitboard>) {
+        let board_to_move_opt = self.board.get_proper_board(from);
+        let board_to_clear = self.board.get_proper_board(to);
         //TODO: handle errors and early return
-        self.actually_move(piece_type, from, to, capture_type);
-        
+        let board_to_move = board_to_move_opt.unwrap();
+        board_to_move.move_piece(from, to);
+        if let Some(board) = board_to_clear {
+            // do something if board isnt none
+            board.clear_bit(to);
+        }
         return ()
 
     }

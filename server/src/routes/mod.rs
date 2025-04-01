@@ -37,11 +37,12 @@ async fn get_board(State(state): State<Arc<Mutex<GameState>>>) -> impl IntoRespo
 }
 
 async fn make_move(State(state): State<Arc<Mutex<GameState>>>, Json(payload): Json<RequestPayload>) -> impl IntoResponse {
-    let mut game_state = state.lock().unwrap();
+    let mut game_state: std::sync::MutexGuard<'_, GameState> = state.lock().unwrap();
     let RequestPayload {to, from, piece_type, capture_type} = payload;
-    game_state.make_move(from, to, &piece_type, &capture_type);
-    if let Some(foo) = capture_type {
-        println!("String {} exists!", foo);
-    }
+    let mut board_to_move = game_state.board.get_proper_board(from);
+    let mut board_to_clear = game_state.board.get_proper_board(to);
+
+    game_state.make_move(from, to, board_to_move, board_to_clear);
+
     return (StatusCode::OK, String::from("Successfully moved!"))
 }

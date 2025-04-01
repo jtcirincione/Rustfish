@@ -1,5 +1,3 @@
-use std::collections::btree_map;
-
 const NOT_GH_MASK: u64 =
     0b0011111100111111001111110011111100111111001111110011111100111111;
 
@@ -61,7 +59,7 @@ impl AttackTables {
         let moves = [8, -8, 1, -1, 7, 9, -7, -9];
         
         for mov in moves {
-            let mut potential_move: u64 = 0;
+            let mut potential_move: u64;
             if mov > 0 {
                 potential_move = board << mov
             }
@@ -103,7 +101,7 @@ impl AttackTables {
             -17  // bottom left move # restrict from H
         ];
         for mov in moves {
-            let mut position: u64 = 0;
+            let mut position: u64;
             if mov > 0 {
                 position = board << mov;
             }

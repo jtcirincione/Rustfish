@@ -1,6 +1,7 @@
 use std::collections::HashMap;
-
+use std::ptr::null;
 use crate::enums::Turn;
+use crate::bitboard::Bitboard;
 use crate::attacks::AttackTables;
 
 const NOT_GH_MASK: u64 =
@@ -32,7 +33,7 @@ const SINGLE_PUSH_BP_MASK: u64 =
 
 #[derive(Clone)]
 pub struct Chessboard {
-    pub pieces: HashMap<String, [u64; 2]>, // HashMap where key is piece type and value is array for white/black
+    pub pieces: HashMap<String, [Bitboard; 2]>, // HashMap where key is piece type and value is array for white/black
 }
 
 //TODO: FIGURE OUT HOW TO ADD KNIGHT ATTACKS TO SELF OBJECT
@@ -41,12 +42,12 @@ impl Chessboard {
     pub fn new() -> Chessboard {
         let mut pieces = HashMap::new();
         
-        pieces.insert(String::from("Q"), [0x00000000000008, 0x1000000000000000]); // White on D1, Black on D8
-        pieces.insert(String::from("K"), [0x00000000000010, 0x0800000000000000]); // White on E1, Black on E8
-        pieces.insert(String::from("R"), [0x00000000000081, 0x8100000000000000]); // White on A1 and H1; Black on A8 and H8
-        pieces.insert(String::from("B"), [0x00000000000024, 0x2400000000000000]); // White on C1 and F1; Black on C8 and F8
-        pieces.insert(String::from("N"), [0x00000000000042, 0x4200000000000000]); // White on B1 and G1; Black on B8 and G8
-        pieces.insert(String::from("p"), [0x000000000000FF00, 0x00FF000000000000]); // White on A2-H2; Black on A7-H7
+        pieces.insert(String::from("Q"), [Bitboard::new(0x00000000000008), Bitboard::new(0x0800000000000000)]); // White on D1, Black on D8
+        pieces.insert(String::from("K"), [Bitboard::new(0x00000000000010), Bitboard::new(0x1000000000000000)]); // White on E1, Black on E8
+        pieces.insert(String::from("R"), [Bitboard::new(0x00000000000081), Bitboard::new(0x8100000000000000)]); // White on A1 and H1; Black on A8 and H8
+        pieces.insert(String::from("B"), [Bitboard::new(0x00000000000024), Bitboard::new(0x2400000000000000)]); // White on C1 and F1; Black on C8 and F8
+        pieces.insert(String::from("N"), [Bitboard::new(0x00000000000042), Bitboard::new(0x4200000000000000)]); // White on B1 and G1; Black on B8 and G8
+        pieces.insert(String::from("p"), [Bitboard::new(0x000000000000FF00), Bitboard::new(0x00FF000000000000)]); // White on A2-H2; Black on A7-H7
         
         let board = Chessboard { pieces };
 
@@ -56,8 +57,8 @@ impl Chessboard {
     pub fn print(&self) {
         let mut occupancy: u64 = 0;
         for (_, val) in self.pieces.iter() {
-            occupancy |= val[0];
-            occupancy |= val[1];
+            occupancy |= val[0].board;
+            occupancy |= val[1].board;
         }
 
         for rank in (0..8).rev() {
@@ -94,7 +95,7 @@ impl Chessboard {
     pub fn get_occupancy(&self) -> u64 {
         let mut occupancy: u64 = 0;
         for (_, val) in self.pieces.iter() {
-            occupancy |= val[0] | val[1];
+            occupancy |= val[0].board | val[1].board;
         }
         return occupancy;
     }
@@ -102,9 +103,21 @@ impl Chessboard {
     pub fn get_color_board(&self, color: Turn) -> u64 {
         let mut occupancy: u64 = 0;
         for (_, val) in self.pieces.iter() {
-            occupancy |= if color == Turn::White { val[0] } else { val[1] };
+            occupancy |= if color == Turn::White { val[0].board } else { val[1].board };
         }
         return occupancy;
+    }
+
+    pub fn get_proper_board(&mut self, idx: u64) -> Option<&mut Bitboard> {
+        for (_, val) in self.pieces.iter_mut() {
+            if val[0].get_bit(idx) == 1 {
+                return Some(&mut val[0]);
+            }
+            if val[1].get_bit(idx) == 1 {
+                return Some(&mut val[1]);
+            }
+        }
+        None
     }
 
     
@@ -125,8 +138,8 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    // #[ignore]
     fn test_static_print() {
-        Chessboard::static_print(0x00000000000010);
+        Chessboard::static_print(0x00000000000010 | 0x0800000000000000);
     }
 }
